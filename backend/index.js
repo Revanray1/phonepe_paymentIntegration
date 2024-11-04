@@ -8,7 +8,8 @@ const SALTKEY = "96434309-7796-489d-8924-ab56988a6076"
 const axios = require('axios')
 const uniqid = require('uniqid')
 const sha256 = require('sha256')
-
+const cors = require('cors');
+app.use(cors());
 
 app.get('/', (req, res) => {
     res.send('welcome to phonepe services')
@@ -24,7 +25,7 @@ app.get('/redirect-url/:merchantTransactionId', (req, res) => {
             headers: {
                 accept: 'application/json',
                 'Content-Type': 'application/json',
-                'X-VERIFY' : Xverify,
+                'X-VERIFY': Xverify,
                 'X-MERCHANT-ID': merchantTransactionId,
             },
 
@@ -33,11 +34,10 @@ app.get('/redirect-url/:merchantTransactionId', (req, res) => {
             .request(options)
             .then(function (response) {
                 console.log(response.data);
-                // res.send(response.data)
-                if(response.data.code === "PAYMENT_SUCCESS") {
-                    res.redirect("/")
-                }else if (response.data.code === "PAYMENT_ERROR"){
-                      
+                if (response.data.code === "PAYMENT_SUCCESS") {
+                    res.redirect(`http://localhost:3000/redirect-url/${merchantTransactionId}`)
+                } else if (response.data.code === "PAYMENT_ERROR") {
+
                 }
             })
             .catch(function (error) {
@@ -88,7 +88,8 @@ app.get('/pay', (req, res) => {
         .request(options)
         .then(function (response) {
             console.log(response.data.data.instrumentResponse.redirectInfo.url);
-            res.redirect(response.data.data.instrumentResponse.redirectInfo.url)
+            res.send(response.data.data.instrumentResponse.redirectInfo.url);
+            // res.redirect(response.data.data.instrumentResponse.redirectInfo.url)
         })
         .catch(function (error) {
             console.error(error);
