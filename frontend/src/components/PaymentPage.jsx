@@ -20,7 +20,13 @@ const PaymentPage = () => {
     useEffect(() => {
         fetchInitiatePayment()
     }, [])
-    return <h1>Payment Page</h1>;
+    return (
+        <div className='container'>
+            <h1>Payment Page</h1>
+            <button onClick={fetchInitiatePayment}>Pay Now</button>
+
+        </div>
+    );
 };
 
 export default PaymentPage;

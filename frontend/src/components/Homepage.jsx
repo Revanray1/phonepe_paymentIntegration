@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom';
 
 const HomePage = () => {
   return (
-    <div>
+    <div className='container' style={{textAlign:"center"}}>
       <h1>Home Page</h1>
       <Link to="/pay">
-        <button style={{ padding: '10px 20px', fontSize: '16px' }}>
-          Pay
-        </button>
+      <div className='p-4'>
+      <button type="button" class="btn btn-success">Pay Amount</button>
+      </div>
       </Link>
     </div>
   );
