@@ -1,6 +1,6 @@
 import axiosInstance from './config';
 
-export const initiatePayment = async () => {
+export const initiatePayment = async ({amount}) => {
     try {
         const response = await axiosInstance.get(`/pay`, {
             // params: {

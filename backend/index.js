@@ -55,6 +55,7 @@ app.get('/pay', (req, res) => {
     const merchantTransactionId = uniqid();
     const userId = 123
 
+
     const payload = {
         "merchantId": MERCHANTID,
         "merchantTransactionId": merchantTransactionId,
