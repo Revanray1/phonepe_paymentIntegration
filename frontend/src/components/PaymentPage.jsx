@@ -9,7 +9,7 @@ const PaymentPage = () => {
 
     const fetchInitiatePayment = async () => {
         try {
-            const response = await initiatePayment({amount})
+            const response = await initiatePayment(amount)
             console.log(response)
             // navigate(response)
             window.location.href = response
@@ -18,7 +18,7 @@ const PaymentPage = () => {
         }
     }
 
-    // useEffect(() => {
+    // useEffect(() => { 
     //     // fetchInitiatePayment()
     // }, [])
     return (

@@ -10,57 +10,25 @@ const uniqid = require('uniqid')
 const sha256 = require('sha256')
 const cors = require('cors');
 app.use(cors());
+app.use(express.json());  // Middleware to parse JSON request bodies
+
 
 app.get('/', (req, res) => {
     res.send('welcome to phonepe services')
 })
 
-app.get('/redirect-url/:merchantTransactionId', (req, res) => {
-    const { merchantTransactionId } = req.params;
-    if (merchantTransactionId) {
-        const Xverify = sha256(`/pg/v1/status/${MERCHANTID}/${merchantTransactionId}` + SALTKEY) + "###" + SALTINDEX
-        const options = {
-            method: 'get',
-            url: `${HOST_URL}/pg/v1/status/${MERCHANTID}/${merchantTransactionId}`,
-            headers: {
-                accept: 'application/json',
-                'Content-Type': 'application/json',
-                'X-VERIFY': Xverify,
-                'X-MERCHANT-ID': merchantTransactionId,
-            },
-
-        };
-        axios
-            .request(options)
-            .then(function (response) {
-                console.log(response.data);
-                if (response.data.code === "PAYMENT_SUCCESS") {
-                    res.redirect(`http://localhost:3000/redirect-url/${merchantTransactionId}`)
-                } else if (response.data.code === "PAYMENT_ERROR") {
-
-                }
-            })
-            .catch(function (error) {
-                console.error(error);
-            });
-
-        // res.send(`Redirecting to payment gateway for transaction id: ${merchantTransactionId}`)
-    } else {
-        res.send('Invalid transaction id')
-    }
-})
-
-app.get('/pay', (req, res) => {
+app.post('/pay', (req, res) => {
+    const { amount} = req.body
     const payEndpoints = "/pg/v1/pay";
     const merchantTransactionId = uniqid();
     const userId = 123
-
+    const amountInPaise = amount * 100
 
     const payload = {
         "merchantId": MERCHANTID,
         "merchantTransactionId": merchantTransactionId,
         "merchantUserId": userId,
-        "amount": 30000,  // in paise
+        "amount": amountInPaise,  // in paise
         "redirectUrl": `http://localhost:3001/redirect-url/${merchantTransactionId}`,
         "redirectMode": "REDIRECT",
         // "callbackUrl": "https://webhook.site/callback-url",
@@ -97,7 +65,45 @@ app.get('/pay', (req, res) => {
         });
 
 })
+
+//after Payment redirect URL 
+app.get('/redirect-url/:merchantTransactionId', (req, res) => {
+    const { merchantTransactionId } = req.params;
+    if (merchantTransactionId) {
+        const Xverify = sha256(`/pg/v1/status/${MERCHANTID}/${merchantTransactionId}` + SALTKEY) + "###" + SALTINDEX
+        const options = {
+            method: 'get',
+            url: `${HOST_URL}/pg/v1/status/${MERCHANTID}/${merchantTransactionId}`,
+            headers: {
+                accept: 'application/json',
+                'Content-Type': 'application/json',
+                'X-VERIFY': Xverify,
+                'X-MERCHANT-ID': merchantTransactionId,
+            },
+
+        };
+        axios
+            .request(options)
+            .then(function (response) {
+                console.log(response.data);
+                if (response.data.code === "PAYMENT_SUCCESS") {
+                    res.redirect(`http://localhost:3000/redirect-url/${merchantTransactionId}`)
+                } else if (response.data.code === "PAYMENT_ERROR") {
+
+                }
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+
+        // res.send(`Redirecting to payment gateway for transaction id: ${merchantTransactionId}`)
+    } else {
+        res.send('Invalid transaction id')
+    }
+})
+
+// Initiating Payment API
+
 app.listen(PORT, () => {
     console.log(`listening on ${PORT}`);
-
 })  
